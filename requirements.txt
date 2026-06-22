@@ -1,7 +1,4 @@
-requirements.txt
-
----------------------------
 streamlit
 pandas
 openpyxl
----------------------------
+plotly
