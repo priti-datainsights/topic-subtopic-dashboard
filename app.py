@@ -1,14 +1,49 @@
 import streamlit as st
 import pandas as pd
+import plotly.express as px
 
 st.set_page_config(
-    page_title="Topic & SubTopic Dashboard",
+    page_title="Topic & SubTopic Analytics",
+    page_icon="📚",
     layout="wide"
 )
 
-# =========================
+# ==================================================
+# CUSTOM CSS
+# ==================================================
+
+st.markdown("""
+<style>
+
+.main {
+    background-color: #f8fafc;
+}
+
+.metric-card {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0px 2px 8px rgba(0,0,0,0.08);
+    text-align:center;
+}
+
+.metric-value{
+    font-size:32px;
+    font-weight:bold;
+    color:#0f766e;
+}
+
+.metric-label{
+    color:#64748b;
+    font-size:14px;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# ==================================================
 # LOAD DATA
-# =========================
+# ==================================================
 
 FILE_PATH = "Topic_SubTopic_Cancelled_Offline_May2026.xlsx"
 
@@ -32,28 +67,17 @@ def load_data():
 
     return topic_df, cancelled_df, offline_df
 
-
 topic_df, cancelled_df, offline_df = load_data()
 
-topic_df["session_date"] = pd.to_datetime(
-    topic_df["session_date"],
-    errors="coerce"
-)
+# ==================================================
+# SIDEBAR
+# ==================================================
 
-# =========================
-# SIDEBAR FILTERS
-# =========================
-
-st.sidebar.header("Filters")
+st.sidebar.title("📊 Filters")
 
 state_filter = st.sidebar.multiselect(
     "State",
     sorted(topic_df["state"].dropna().unique())
-)
-
-grade_filter = st.sidebar.multiselect(
-    "Grade",
-    sorted(topic_df["grade"].dropna().unique())
 )
 
 subject_filter = st.sidebar.multiselect(
@@ -61,207 +85,275 @@ subject_filter = st.sidebar.multiselect(
     sorted(topic_df["subject"].dropna().unique())
 )
 
-status_filter = st.sidebar.multiselect(
-    "Session Status",
-    sorted(topic_df["session_status"].dropna().unique())
+grade_filter = st.sidebar.multiselect(
+    "Grade",
+    sorted(topic_df["grade"].dropna().unique())
 )
-
-subproject_filter = st.sidebar.multiselect(
-    "Sub Project",
-    sorted(topic_df["Sub_Project"].dropna().unique())
-)
-
-# =========================
-# FILTER DATA
-# =========================
-
-filtered_df = topic_df.copy()
 
 if state_filter:
-    filtered_df = filtered_df[
-        filtered_df["state"].isin(state_filter)
-    ]
-
-if grade_filter:
-    filtered_df = filtered_df[
-        filtered_df["grade"].isin(grade_filter)
+    topic_df = topic_df[
+        topic_df["state"].isin(state_filter)
     ]
 
 if subject_filter:
-    filtered_df = filtered_df[
-        filtered_df["subject"].isin(subject_filter)
+    topic_df = topic_df[
+        topic_df["subject"].isin(subject_filter)
     ]
 
-if status_filter:
-    filtered_df = filtered_df[
-        filtered_df["session_status"].isin(status_filter)
+if grade_filter:
+    topic_df = topic_df[
+        topic_df["grade"].isin(grade_filter)
     ]
 
-if subproject_filter:
-    filtered_df = filtered_df[
-        filtered_df["Sub_Project"].isin(subproject_filter)
-    ]
+# ==================================================
+# TITLE
+# ==================================================
 
-# =========================
-# HEADER
-# =========================
+st.title("📚 Topic & SubTopic Analytics Dashboard")
 
-st.title("Topic & Sub Topic Dashboard")
-
-# =========================
+# ==================================================
 # KPI CARDS
-# =========================
+# ==================================================
 
-c1, c2, c3, c4, c5 = st.columns(5)
+total_sessions = len(topic_df)
 
-c1.metric(
-    "Total Sessions",
-    filtered_df["session_id"].nunique()
-)
+unique_topics = topic_df["topic_name"].nunique()
 
-c2.metric(
-    "Centers",
-    filtered_df["center_id"].nunique()
-)
+unique_subtopics = topic_df["sub_topic_name"].nunique()
 
-c3.metric(
-    "Volunteers",
-    filtered_df["vt_ev_id"].nunique()
-)
+unique_centers = topic_df["center_id"].nunique()
 
-c4.metric(
-    "Topics",
-    filtered_df["topic_name"].nunique()
-)
+col1,col2,col3,col4 = st.columns(4)
 
-c5.metric(
-    "Sub Topics",
-    filtered_df["sub_topic_name"].nunique()
-)
+with col1:
+    st.metric("Total Sessions", f"{total_sessions:,}")
 
-# =========================
+with col2:
+    st.metric("Unique Topics", f"{unique_topics:,}")
+
+with col3:
+    st.metric("Unique Subtopics", f"{unique_subtopics:,}")
+
+with col4:
+    st.metric("Active Centers", f"{unique_centers:,}")
+
+# ==================================================
+# TABS
+# ==================================================
+
+tab1, tab2, tab3 = st.tabs([
+    "📚 Topic Analysis",
+    "🚫 Cancelled Sessions",
+    "📵 Offline Sessions"
+])
+
+# ==================================================
 # TOPIC ANALYSIS
-# =========================
+# ==================================================
 
-st.subheader("Top Topics")
+with tab1:
 
-topic_summary = (
-    filtered_df
-    .groupby("topic_name")["session_id"]
-    .nunique()
-    .reset_index(name="Sessions")
-    .sort_values("Sessions", ascending=False)
-    .head(20)
-)
+    st.subheader("Top Topics")
 
-st.bar_chart(
-    topic_summary.set_index("topic_name")
-)
+    topic_summary = (
+        topic_df
+        .groupby("topic_name")
+        .size()
+        .reset_index(name="Sessions")
+        .sort_values(
+            "Sessions",
+            ascending=False
+        )
+        .head(20)
+    )
 
-# =========================
-# SUB TOPIC ANALYSIS
-# =========================
+    fig = px.bar(
+        topic_summary,
+        x="Sessions",
+        y="topic_name",
+        orientation="h",
+        title="Top 20 Topics"
+    )
 
-st.subheader("Top Sub Topics")
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
 
-subtopic_summary = (
-    filtered_df
-    .groupby("sub_topic_name")["session_id"]
-    .nunique()
-    .reset_index(name="Sessions")
-    .sort_values("Sessions", ascending=False)
-    .head(20)
-)
+    st.subheader("Top Sub Topics")
 
-st.bar_chart(
-    subtopic_summary.set_index("sub_topic_name")
-)
+    subtopic_summary = (
+        topic_df
+        .groupby("sub_topic_name")
+        .size()
+        .reset_index(name="Sessions")
+        .sort_values(
+            "Sessions",
+            ascending=False
+        )
+        .head(20)
+    )
 
-# =========================
-# STATE ANALYSIS
-# =========================
+    fig2 = px.bar(
+        subtopic_summary,
+        x="Sessions",
+        y="sub_topic_name",
+        orientation="h",
+        title="Top 20 Sub Topics"
+    )
 
-st.subheader("State-wise Sessions")
+    st.plotly_chart(
+        fig2,
+        use_container_width=True
+    )
 
-state_summary = (
-    filtered_df
-    .groupby("state")["session_id"]
-    .nunique()
-    .reset_index(name="Sessions")
-    .sort_values("Sessions", ascending=False)
-)
+    st.subheader("Subject Distribution")
 
-st.bar_chart(
-    state_summary.set_index("state")
-)
+    subject_chart = (
+        topic_df
+        .groupby("subject")
+        .size()
+        .reset_index(name="Count")
+    )
 
-# =========================
-# VOLUNTEER ANALYSIS
-# =========================
+    fig3 = px.pie(
+        subject_chart,
+        names="subject",
+        values="Count"
+    )
 
-st.subheader("Volunteer-wise Sessions")
+    st.plotly_chart(
+        fig3,
+        use_container_width=True
+    )
 
-vol_summary = (
-    filtered_df
-    .groupby("vt_name")["session_id"]
-    .nunique()
-    .reset_index(name="Sessions")
-    .sort_values("Sessions", ascending=False)
-    .head(20)
-)
+# ==================================================
+# CANCELLED
+# ==================================================
 
-st.bar_chart(
-    vol_summary.set_index("vt_name")
-)
+with tab2:
 
-# =========================
-# SESSION STATUS
-# =========================
+    st.subheader("Cancelled Session Analysis")
 
-st.subheader("Session Status Distribution")
+    st.metric(
+        "Total Cancelled Sessions",
+        len(cancelled_df)
+    )
 
-status_summary = (
-    filtered_df
-    .groupby("session_status")["session_id"]
-    .nunique()
-    .reset_index(name="Sessions")
-)
+    cancel_chart = (
+        cancelled_df
+        .groupby("cancel_reason")
+        .size()
+        .reset_index(name="Count")
+        .sort_values(
+            "Count",
+            ascending=False
+        )
+        .head(15)
+    )
 
-st.dataframe(status_summary)
+    fig4 = px.bar(
+        cancel_chart,
+        x="Count",
+        y="cancel_reason",
+        orientation="h",
+        title="Cancellation Reasons"
+    )
 
-# =========================
-# TREND
-# =========================
+    st.plotly_chart(
+        fig4,
+        use_container_width=True
+    )
 
-st.subheader("Daily Session Trend")
+    state_cancel = (
+        cancelled_df
+        .groupby("State")
+        .size()
+        .reset_index(name="Count")
+        .sort_values(
+            "Count",
+            ascending=False
+        )
+    )
 
-trend = (
-    filtered_df
-    .groupby("session_date")["session_id"]
-    .nunique()
-    .reset_index(name="Sessions")
-)
+    fig5 = px.bar(
+        state_cancel,
+        x="State",
+        y="Count",
+        title="Cancelled Sessions by State"
+    )
 
-st.line_chart(
-    trend.set_index("session_date")
-)
+    st.plotly_chart(
+        fig5,
+        use_container_width=True
+    )
 
-# =========================
-# DATA TABLE
-# =========================
+# ==================================================
+# OFFLINE
+# ==================================================
 
-st.subheader("Detailed Data")
+with tab3:
 
-st.dataframe(
-    filtered_df,
-    use_container_width=True
-)
+    st.subheader("Offline Session Analysis")
 
-csv = filtered_df.to_csv(index=False)
+    st.metric(
+        "Total Offline Sessions",
+        len(offline_df)
+    )
+
+    offline_reason = (
+        offline_df
+        .groupby("Offline reason")
+        .size()
+        .reset_index(name="Count")
+        .sort_values(
+            "Count",
+            ascending=False
+        )
+    )
+
+    fig6 = px.bar(
+        offline_reason,
+        x="Count",
+        y="Offline reason",
+        orientation="h",
+        title="Offline Reasons"
+    )
+
+    st.plotly_chart(
+        fig6,
+        use_container_width=True
+    )
+
+    state_offline = (
+        offline_df
+        .groupby("State")
+        .size()
+        .reset_index(name="Count")
+        .sort_values(
+            "Count",
+            ascending=False
+        )
+    )
+
+    fig7 = px.bar(
+        state_offline,
+        x="State",
+        y="Count",
+        title="Offline Sessions by State"
+    )
+
+    st.plotly_chart(
+        fig7,
+        use_container_width=True
+    )
+
+# ==================================================
+# DOWNLOAD
+# ==================================================
 
 st.download_button(
-    "Download Filtered Data",
-    csv,
-    "topic_subtopic_data.csv",
-    "text/csv"
+    "📥 Download Topic Data",
+    topic_df.to_csv(index=False),
+    file_name="topic_data.csv"
 )
