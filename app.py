@@ -2,11 +2,14 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
+
 st.set_page_config(
     page_title="Topic & SubTopic Analytics",
     page_icon="📚",
-    layout="wide",
-    st.markdown("""
+    layout="wide"
+)
+
+st.markdown("""
 <style>
 
 .block-container{
@@ -33,40 +36,6 @@ st.set_page_config(
 
 [data-testid="stSidebar"] *{
     color:white;
-}
-
-</style>
-""", unsafe_allow_html=True)
-)
-
-# ==================================================
-# CUSTOM CSS
-# ==================================================
-
-st.markdown("""
-<style>
-
-.main {
-    background-color: #f8fafc;
-}
-
-.metric-card {
-    background: white;
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0px 2px 8px rgba(0,0,0,0.08);
-    text-align:center;
-}
-
-.metric-value{
-    font-size:32px;
-    font-weight:bold;
-    color:#0f766e;
-}
-
-.metric-label{
-    color:#64748b;
-    font-size:14px;
 }
 
 </style>
