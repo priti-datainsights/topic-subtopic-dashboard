@@ -5,7 +5,7 @@ import plotly.express as px
 st.set_page_config(
     page_title="Topic & SubTopic Analytics",
     page_icon="📚",
-    layout="wide"
+    layout="wide",
     st.markdown("""
 <style>
 
