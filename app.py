@@ -6,6 +6,37 @@ st.set_page_config(
     page_title="Topic & SubTopic Analytics",
     page_icon="📚",
     layout="wide"
+    st.markdown("""
+<style>
+
+.block-container{
+    padding-top:1rem;
+    padding-bottom:1rem;
+}
+
+.metric-card{
+    background:#ffffff;
+    padding:18px;
+    border-radius:12px;
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+}
+
+[data-testid="stMetricValue"]{
+    font-size:34px;
+    font-weight:700;
+    color:#0f766e;
+}
+
+[data-testid="stSidebar"]{
+    background:#0f172a;
+}
+
+[data-testid="stSidebar"] *{
+    color:white;
+}
+
+</style>
+""", unsafe_allow_html=True)
 )
 
 # ==================================================
