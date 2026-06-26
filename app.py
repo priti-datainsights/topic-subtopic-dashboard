@@ -90,19 +90,22 @@ grade_filter = st.sidebar.multiselect(
     sorted(topic_df["grade"].dropna().unique())
 )
 
+# Create filtered dataframe
+filtered_df = topic_df.copy()
+
 if state_filter:
-    topic_df = topic_df[
-        topic_df["state"].isin(state_filter)
+    filtered_df = filtered_df[
+        filtered_df["state"].isin(state_filter)
     ]
 
 if subject_filter:
-    topic_df = topic_df[
-        topic_df["subject"].isin(subject_filter)
+    filtered_df = filtered_df[
+        filtered_df["subject"].isin(subject_filter)
     ]
 
 if grade_filter:
-    topic_df = topic_df[
-        topic_df["grade"].isin(grade_filter)
+    filtered_df = filtered_df[
+        filtered_df["grade"].isin(grade_filter)
     ]
 
 # ==================================================
@@ -115,14 +118,13 @@ st.title("📚 Topic & SubTopic Analytics Dashboard")
 # KPI CARDS
 # ==================================================
 
-total_sessions = len(topic_df)
+total_sessions = len(filtered_df)
 
-unique_topics = topic_df["topic_name"].nunique()
+unique_topics = filtered_df["topic_name"].nunique()
 
-unique_subtopics = topic_df["sub_topic_name"].nunique()
+unique_subtopics = filtered_df["sub_topic_name"].nunique()
 
-unique_centers = topic_df["center_id"].nunique()
-
+unique_centers = filtered_df["center_id"].nunique()
 col1,col2,col3,col4 = st.columns(4)
 
 with col1:
@@ -155,8 +157,8 @@ with tab1:
 
     st.subheader("Top Topics")
 
-    topic_summary = (
-        topic_df
+        topic_summary = (
+    filtered_df
         .groupby("topic_name")
         .size()
         .reset_index(name="Sessions")
@@ -183,7 +185,7 @@ with tab1:
     st.subheader("Top Sub Topics")
 
     subtopic_summary = (
-        topic_df
+    filtered_df
         .groupby("sub_topic_name")
         .size()
         .reset_index(name="Sessions")
@@ -210,7 +212,7 @@ with tab1:
     st.subheader("Subject Distribution")
 
     subject_chart = (
-        topic_df
+    filtered_df
         .groupby("subject")
         .size()
         .reset_index(name="Count")
@@ -226,7 +228,35 @@ with tab1:
         fig3,
         use_container_width=True
     )
+st.markdown("---")
 
+st.subheader("📋 Topic / Sub-topic Session Summary")
+
+pivot_table = (
+    filtered_df
+    .groupby(
+        ["topic_name", "sub_topic_name"],
+        dropna=False
+    )
+    .size()
+    .reset_index(name="#Sessions")
+    .sort_values("#Sessions", ascending=False)
+)
+
+st.dataframe(
+    pivot_table,
+    use_container_width=True,
+    hide_index=True
+)
+
+csv = pivot_table.to_csv(index=False)
+
+st.download_button(
+    "⬇ Download Topic Summary",
+    csv,
+    "Topic_SubTopic_Summary.csv",
+    "text/csv"
+)
 # ==================================================
 # CANCELLED
 # ==================================================
@@ -354,6 +384,6 @@ with tab3:
 
 st.download_button(
     "📥 Download Topic Data",
-    topic_df.to_csv(index=False),
+    filtered_df.to_csv(index=False),
     file_name="topic_data.csv"
 )
