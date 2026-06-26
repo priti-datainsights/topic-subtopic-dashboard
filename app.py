@@ -157,15 +157,12 @@ with tab1:
 
     st.subheader("Top Topics")
 
-        topic_summary = (
-    filtered_df
+    topic_summary = (
+        filtered_df
         .groupby("topic_name")
         .size()
         .reset_index(name="Sessions")
-        .sort_values(
-            "Sessions",
-            ascending=False
-        )
+        .sort_values("Sessions", ascending=False)
         .head(20)
     )
 
@@ -177,22 +174,16 @@ with tab1:
         title="Top 20 Topics"
     )
 
-    st.plotly_chart(
-        fig,
-        use_container_width=True
-    )
+    st.plotly_chart(fig, use_container_width=True)
 
     st.subheader("Top Sub Topics")
 
     subtopic_summary = (
-    filtered_df
+        filtered_df
         .groupby("sub_topic_name")
         .size()
         .reset_index(name="Sessions")
-        .sort_values(
-            "Sessions",
-            ascending=False
-        )
+        .sort_values("Sessions", ascending=False)
         .head(20)
     )
 
@@ -204,15 +195,12 @@ with tab1:
         title="Top 20 Sub Topics"
     )
 
-    st.plotly_chart(
-        fig2,
-        use_container_width=True
-    )
+    st.plotly_chart(fig2, use_container_width=True)
 
     st.subheader("Subject Distribution")
 
     subject_chart = (
-    filtered_df
+        filtered_df
         .groupby("subject")
         .size()
         .reset_index(name="Count")
@@ -224,39 +212,37 @@ with tab1:
         values="Count"
     )
 
-    st.plotly_chart(
-        fig3,
-        use_container_width=True
+    st.plotly_chart(fig3, use_container_width=True)
+
+    st.markdown("---")
+
+    st.subheader("📋 Topic / Sub-topic Session Summary")
+
+    pivot_table = (
+        filtered_df
+        .groupby(
+            ["topic_name", "sub_topic_name"],
+            dropna=False
+        )
+        .size()
+        .reset_index(name="#Sessions")
+        .sort_values("#Sessions", ascending=False)
     )
-st.markdown("---")
 
-st.subheader("📋 Topic / Sub-topic Session Summary")
-
-pivot_table = (
-    filtered_df
-    .groupby(
-        ["topic_name", "sub_topic_name"],
-        dropna=False
+    st.dataframe(
+        pivot_table,
+        use_container_width=True,
+        hide_index=True
     )
-    .size()
-    .reset_index(name="#Sessions")
-    .sort_values("#Sessions", ascending=False)
-)
 
-st.dataframe(
-    pivot_table,
-    use_container_width=True,
-    hide_index=True
-)
+    csv = pivot_table.to_csv(index=False)
 
-csv = pivot_table.to_csv(index=False)
-
-st.download_button(
-    "⬇ Download Topic Summary",
-    csv,
-    "Topic_SubTopic_Summary.csv",
-    "text/csv"
-)
+    st.download_button(
+        "⬇ Download Topic Summary",
+        csv,
+        "Topic_SubTopic_Summary.csv",
+        "text/csv"
+    )
 # ==================================================
 # CANCELLED
 # ==================================================
