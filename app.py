@@ -107,7 +107,14 @@ if grade_filter:
     filtered_df = filtered_df[
         filtered_df["grade"].isin(grade_filter)
     ]
-
+session_filter = st.sidebar.multiselect(
+    "Session Status",
+    sorted(topic_df["session_status"].dropna().unique())
+)
+centre_filter = st.sidebar.multiselect(
+    "Centre",
+    sorted(topic_df["center_name"].dropna().unique())
+)
 # ==================================================
 # TITLE
 # ==================================================
@@ -155,66 +162,66 @@ tab1, tab2, tab3 = st.tabs([
 
 with tab1:
 
-    st.subheader("Top Topics")
+    # st.subheader("Top Topics")
 
-    topic_summary = (
-        filtered_df
-        .groupby("topic_name")
-        .size()
-        .reset_index(name="Sessions")
-        .sort_values("Sessions", ascending=False)
-        .head(20)
-    )
+    # topic_summary = (
+      #  filtered_df
+       # groupby("topic_name")
+       # .size()
+        #.reset_index(name="Sessions")
+        #.sort_values("Sessions", ascending=False)
+        #.head(20)
+   # )
 
-    fig = px.bar(
-        topic_summary,
-        x="Sessions",
-        y="topic_name",
-        orientation="h",
-        title="Top 20 Topics"
-    )
+    #fig = px.bar(
+       # topic_summary,
+       # x="Sessions",
+       # y="topic_name",
+       # orientation="h",
+        #title="Top 20 Topics"
+    #)
 
-    st.plotly_chart(fig, use_container_width=True)
+    #st.plotly_chart(fig, use_container_width=True)
 
-    st.subheader("Top Sub Topics")
+    #st.subheader("Top Sub Topics")
 
-    subtopic_summary = (
-        filtered_df
-        .groupby("sub_topic_name")
-        .size()
-        .reset_index(name="Sessions")
-        .sort_values("Sessions", ascending=False)
-        .head(20)
-    )
+   # subtopic_summary = (
+        #filtered_df
+       # .groupby("sub_topic_name")
+       # .size()
+       # .reset_index(name="Sessions")
+        #.sort_values("Sessions", ascending=False)
+        #.head(20)
+    #)
 
-    fig2 = px.bar(
-        subtopic_summary,
-        x="Sessions",
-        y="sub_topic_name",
-        orientation="h",
-        title="Top 20 Sub Topics"
-    )
+  #  fig2 = px.bar(
+       # subtopic_summary,
+       # x="Sessions",
+       # y="sub_topic_name",
+       # orientation="h",
+        #title="Top 20 Sub Topics"
+   # )
 
-    st.plotly_chart(fig2, use_container_width=True)
+    #st.plotly_chart(fig2, use_container_width=True)
 
-    st.subheader("Subject Distribution")
+    #st.subheader("Subject Distribution")
 
-    subject_chart = (
-        filtered_df
-        .groupby("subject")
-        .size()
-        .reset_index(name="Count")
-    )
+   # subject_chart = (
+        #filtered_df
+       # .groupby("subject")
+        #.size()
+        #.reset_index(name="Count")
+   # )
 
-    fig3 = px.pie(
-        subject_chart,
-        names="subject",
-        values="Count"
-    )
+   # fig3 = px.pie(
+        #subject_chart,
+       # names="subject",
+       # values="Count"
+   # )
 
-    st.plotly_chart(fig3, use_container_width=True)
+    #st.plotly_chart(fig3, use_container_width=True)
 
-    st.markdown("---")
+    #st.markdown("---")
 
     st.subheader("📋 Topic / Sub-topic Session Summary")
 
@@ -230,11 +237,11 @@ with tab1:
     )
 
     st.dataframe(
-        pivot_table,
-        use_container_width=True,
-        hide_index=True
-    )
-
+    pivot_table,
+    use_container_width=True,
+    hide_index=True,
+    height=700
+)
     csv = pivot_table.to_csv(index=False)
 
     st.download_button(
