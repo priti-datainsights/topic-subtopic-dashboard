@@ -226,31 +226,32 @@ with tab1:
     st.subheader("📋 Topic / Sub-topic Session Summary")
 
     pivot_table = (
-        filtered_df
-        .groupby(
-            ["topic_name", "sub_topic_name"],
-            dropna=False
-        )
-        .size()
-        .reset_index(name="#Sessions")
-        .sort_values("#Sessions", ascending=False)
+    filtered_df
+    .groupby(
+        ["topic_name", "sub_topic_name"],
+        dropna=False
     )
+    .size()
+    .reset_index(name="#Sessions")
+    .sort_values(
+        "#Sessions",
+        ascending=False
+    )
+)
 
-    st.dataframe(
+pivot_table = pivot_table.rename(columns={
+    "topic_name":"Topic",
+    "sub_topic_name":"Sub-topic"
+})
+
+st.subheader("📋 Topic / Sub-topic Session Summary")
+
+st.dataframe(
     pivot_table,
     use_container_width=True,
     hide_index=True,
     height=700
 )
-    csv = pivot_table.to_csv(index=False)
-
-    st.download_button(
-        "⬇ Download Topic Summary",
-        csv,
-        "Topic_SubTopic_Summary.csv",
-        "text/csv"
-    )
-# ==================================================
 # CANCELLED
 # ==================================================
 
