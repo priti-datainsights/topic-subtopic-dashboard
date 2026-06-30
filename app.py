@@ -70,43 +70,71 @@ def load_data():
 topic_df, cancelled_df, offline_df = load_data()
 
 # ==================================================
+
+# ==================================================
 # SIDEBAR
 # ==================================================
 
 st.sidebar.title("📊 Filters")
 
+# Keep original data untouched
+base_df = topic_df.copy()
+
+# -----------------------
+# State
+# -----------------------
 state_filter = st.sidebar.multiselect(
     "State",
-    sorted(topic_df["state"].dropna().unique())
+    sorted(base_df["state"].dropna().unique())
 )
+
 state_df = base_df.copy()
 
 if state_filter:
     state_df = state_df[
         state_df["state"].isin(state_filter)
     ]
+
+# -----------------------
+# Subject
+# -----------------------
 subject_filter = st.sidebar.multiselect(
     "Subject",
-    sorted(topic_df["subject"].dropna().unique())
+    sorted(state_df["subject"].dropna().unique())
 )
+
 subject_df = state_df.copy()
 
 if subject_filter:
     subject_df = subject_df[
         subject_df["subject"].isin(subject_filter)
     ]
+
+# -----------------------
+# Grade
+# -----------------------
 grade_filter = st.sidebar.multiselect(
     "Grade",
-    sorted(topic_df["grade"].dropna().unique())
+    sorted(subject_df["grade"].dropna().unique())
 )
+
+grade_df = subject_df.copy()
+
+if grade_filter:
+    grade_df = grade_df[
+        grade_df["grade"].isin(grade_filter)
+    ]
+
+# -----------------------
+# Session Status
+# -----------------------
 status_filter = st.sidebar.multiselect(
     "Session Status",
     sorted(
-        grade_df["session_status"]
-        .dropna()
-        .unique()
+        grade_df["session_status"].dropna().unique()
     )
 )
+
 status_df = grade_df.copy()
 
 if status_filter:
@@ -114,53 +142,22 @@ if status_filter:
         status_df["session_status"].isin(status_filter)
     ]
 
+# -----------------------
+# Centre
+# -----------------------
 centre_filter = st.sidebar.multiselect(
     "Centre",
     sorted(
-        status_df["center_name"]
-        .dropna()
-        .unique()
+        status_df["center_name"].dropna().unique()
     )
 )
-grade_df = subject_df.copy()
 
-if grade_filter:
-    grade_df = grade_df[
-        grade_df["grade"].isin(grade_filter)
-    ]
-# Create filtered dataframe
-filtered_df = topic_df.copy()
-
-if state_filter:
-    filtered_df = filtered_df[
-        filtered_df["state"].isin(state_filter)
-    ]
-
-if subject_filter:
-    filtered_df = filtered_df[
-        filtered_df["subject"].isin(subject_filter)
-    ]
-
-if grade_filter:
-    filtered_df = filtered_df[
-        filtered_df["grade"].isin(grade_filter)
-    ]
-session_filter = st.sidebar.multiselect(
-    "Session Status",
-    sorted(topic_df["session_status"].dropna().unique())
-)
-centre_filter = st.sidebar.multiselect(
-    "Centre",
-    sorted(topic_df["center_name"].dropna().unique())
-)
 filtered_df = status_df.copy()
 
 if centre_filter:
     filtered_df = filtered_df[
         filtered_df["center_name"].isin(centre_filter)
     ]
-# ==================================================
-# TITLE
 # ==================================================
 
 st.title("📚 Topic & SubTopic Analytics Dashboard")
@@ -206,96 +203,30 @@ tab1, tab2, tab3 = st.tabs([
 
 with tab1:
 
-    # st.subheader("Top Topics")
-
-    # topic_summary = (
-      #  filtered_df
-       # groupby("topic_name")
-       # .size()
-        #.reset_index(name="Sessions")
-        #.sort_values("Sessions", ascending=False)
-        #.head(20)
-   # )
-
-    #fig = px.bar(
-       # topic_summary,
-       # x="Sessions",
-       # y="topic_name",
-       # orientation="h",
-        #title="Top 20 Topics"
-    #)
-
-    #st.plotly_chart(fig, use_container_width=True)
-
-    #st.subheader("Top Sub Topics")
-
-   # subtopic_summary = (
-        #filtered_df
-       # .groupby("sub_topic_name")
-       # .size()
-       # .reset_index(name="Sessions")
-        #.sort_values("Sessions", ascending=False)
-        #.head(20)
-    #)
-
-  #  fig2 = px.bar(
-       # subtopic_summary,
-       # x="Sessions",
-       # y="sub_topic_name",
-       # orientation="h",
-        #title="Top 20 Sub Topics"
-   # )
-
-    #st.plotly_chart(fig2, use_container_width=True)
-
-    #st.subheader("Subject Distribution")
-
-   # subject_chart = (
-        #filtered_df
-       # .groupby("subject")
-        #.size()
-        #.reset_index(name="Count")
-   # )
-
-   # fig3 = px.pie(
-        #subject_chart,
-       # names="subject",
-       # values="Count"
-   # )
-
-    #st.plotly_chart(fig3, use_container_width=True)
-
-    #st.markdown("---")
-
     st.subheader("📋 Topic / Sub-topic Session Summary")
 
     pivot_table = (
-    filtered_df
-    .groupby(
-        ["topic_name", "sub_topic_name"],
-        dropna=False
+        filtered_df
+        .groupby(
+            ["topic_name", "sub_topic_name"],
+            dropna=False
+        )
+        .size()
+        .reset_index(name="#Sessions")
+        .sort_values("#Sessions", ascending=False)
     )
-    .size()
-    .reset_index(name="#Sessions")
-    .sort_values(
-        "#Sessions",
-        ascending=False
+
+    pivot_table = pivot_table.rename(columns={
+        "topic_name": "Topic",
+        "sub_topic_name": "Sub-topic"
+    })
+
+    st.dataframe(
+        pivot_table,
+        use_container_width=True,
+        hide_index=True,
+        height=700
     )
-)
-
-pivot_table = pivot_table.rename(columns={
-    "topic_name":"Topic",
-    "sub_topic_name":"Sub-topic"
-})
-
-st.subheader("📋 Topic / Sub-topic Session Summary")
-
-st.dataframe(
-    pivot_table,
-    use_container_width=True,
-    hide_index=True,
-    height=700
-)
 # CANCELLED
 # ==================================================
 
