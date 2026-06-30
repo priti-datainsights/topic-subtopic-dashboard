@@ -79,17 +79,55 @@ state_filter = st.sidebar.multiselect(
     "State",
     sorted(topic_df["state"].dropna().unique())
 )
+state_df = base_df.copy()
 
+if state_filter:
+    state_df = state_df[
+        state_df["state"].isin(state_filter)
+    ]
 subject_filter = st.sidebar.multiselect(
     "Subject",
     sorted(topic_df["subject"].dropna().unique())
 )
+subject_df = state_df.copy()
 
+if subject_filter:
+    subject_df = subject_df[
+        subject_df["subject"].isin(subject_filter)
+    ]
 grade_filter = st.sidebar.multiselect(
     "Grade",
     sorted(topic_df["grade"].dropna().unique())
 )
+status_filter = st.sidebar.multiselect(
+    "Session Status",
+    sorted(
+        grade_df["session_status"]
+        .dropna()
+        .unique()
+    )
+)
+status_df = grade_df.copy()
 
+if status_filter:
+    status_df = status_df[
+        status_df["session_status"].isin(status_filter)
+    ]
+
+centre_filter = st.sidebar.multiselect(
+    "Centre",
+    sorted(
+        status_df["center_name"]
+        .dropna()
+        .unique()
+    )
+)
+grade_df = subject_df.copy()
+
+if grade_filter:
+    grade_df = grade_df[
+        grade_df["grade"].isin(grade_filter)
+    ]
 # Create filtered dataframe
 filtered_df = topic_df.copy()
 
@@ -115,6 +153,12 @@ centre_filter = st.sidebar.multiselect(
     "Centre",
     sorted(topic_df["center_name"].dropna().unique())
 )
+filtered_df = status_df.copy()
+
+if centre_filter:
+    filtered_df = filtered_df[
+        filtered_df["center_name"].isin(centre_filter)
+    ]
 # ==================================================
 # TITLE
 # ==================================================
