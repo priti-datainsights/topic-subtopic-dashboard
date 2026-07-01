@@ -211,8 +211,13 @@ with tab1:
             ["topic_name", "sub_topic_name"],
             dropna=False
         )
-        .size()
-        .reset_index(name="#Sessions")
+        .agg(
+            **{
+                "#Sessions": ("topic_name", "count"),
+                "#Schools": ("center_name", "nunique")
+            }
+        )
+        .reset_index()
         .sort_values("#Sessions", ascending=False)
     )
 
