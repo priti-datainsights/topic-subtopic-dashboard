@@ -235,122 +235,122 @@ with tab1:
 # CANCELLED
 # ==================================================
 
-with tab2:
+#with tab2:
 
-    st.subheader("Cancelled Session Analysis")
+   # st.subheader("Cancelled Session Analysis")
 
-    st.metric(
-        "Total Cancelled Sessions",
-        len(cancelled_df)
-    )
+    #st.metric(
+       # "Total Cancelled Sessions",
+       # len(cancelled_df)
+   # )
 
-    cancel_chart = (
-        cancelled_df
-        .groupby("cancel_reason")
-        .size()
-        .reset_index(name="Count")
-        .sort_values(
-            "Count",
-            ascending=False
-        )
-        .head(15)
-    )
+    #cancel_chart = (
+        #cancelled_df
+        #.groupby("cancel_reason")
+        #.size()
+        #.reset_index(name="Count")
+        #.sort_values(
+           # "Count",
+            #ascending=False
+      #  )
+        #.head(15)
+   # )
 
-    fig4 = px.bar(
-        cancel_chart,
-        x="Count",
-        y="cancel_reason",
-        orientation="h",
-        title="Cancellation Reasons"
-    )
+   # fig4 = px.bar(
+        #cancel_chart,
+       # x="Count",
+        #y="cancel_reason",
+        #orientation="h",
+        #title="Cancellation Reasons"
+   # )
 
-    st.plotly_chart(
-        fig4,
-        use_container_width=True
-    )
+    #st.plotly_chart(
+       # fig4,
+        #use_container_width=True
+   # )
 
-    state_cancel = (
-        cancelled_df
-        .groupby("State")
-        .size()
-        .reset_index(name="Count")
-        .sort_values(
-            "Count",
-            ascending=False
-        )
-    )
+   # state_cancel = (
+        #cancelled_df
+       # .groupby("State")
+        #.size()
+       # .reset_index(name="Count")
+       # .sort_values(
+           # "Count",
+            #ascending=False
+       # )
+   # )
 
-    fig5 = px.bar(
-        state_cancel,
-        x="State",
-        y="Count",
-        title="Cancelled Sessions by State"
-    )
+   # fig5 = px.bar(
+       # state_cancel,
+        #x="State",
+       # y="Count",
+        #title="Cancelled Sessions by State"
+   # )
 
-    st.plotly_chart(
-        fig5,
-        use_container_width=True
-    )
+    #st.plotly_chart(
+       # fig5,
+      #  use_container_width=True
+   # )
 
 # ==================================================
 # OFFLINE
 # ==================================================
 
-with tab3:
+# with tab3:
 
-    st.subheader("Offline Session Analysis")
+  #  st.subheader("Offline Session Analysis")
 
-    st.metric(
-        "Total Offline Sessions",
-        len(offline_df)
-    )
+   # st.metric(
+      #  "Total Offline Sessions",
+       # len(offline_df)
+   # )
 
-    offline_reason = (
-        offline_df
-        .groupby("Offline reason")
-        .size()
-        .reset_index(name="Count")
-        .sort_values(
-            "Count",
-            ascending=False
-        )
-    )
+    # offline_reason = (
+      #  offline_df
+        #.groupby("Offline reason")
+       # .size()
+       # .reset_index(name="Count")
+        #.sort_values(
+            #"Count",
+            #ascending=False
+       # )
+   # )
 
-    fig6 = px.bar(
-        offline_reason,
-        x="Count",
-        y="Offline reason",
-        orientation="h",
-        title="Offline Reasons"
-    )
+   # fig6 = px.bar(
+       # offline_reason,
+       # x="Count",
+       # y="Offline reason",
+        #orientation="h",
+       # title="Offline Reasons"
+  #  )
 
-    st.plotly_chart(
-        fig6,
-        use_container_width=True
-    )
+    #st.plotly_chart(
+       # fig6,
+        #use_container_width=True
+  #  )
 
-    state_offline = (
-        offline_df
-        .groupby("State")
-        .size()
-        .reset_index(name="Count")
-        .sort_values(
-            "Count",
-            ascending=False
-        )
-    )
+    #state_offline = (
+      #  offline_df
+       # .groupby("State")
+       # .size()
+        #.reset_index(name="Count")
+        #.sort_values(
+           # "Count",
+           # ascending=False
+       # )
+   # )
 
-    fig7 = px.bar(
-        state_offline,
-        x="State",
-        y="Count",
-        title="Offline Sessions by State"
-    )
+   # fig7 = px.bar(
+      #  state_offline,
+       # x="State",
+       # y="Count",
+       # title="Offline Sessions by State"
+  #  )
 
-    st.plotly_chart(
-        fig7,
-        use_container_width=True
-    )
+   # st.plotly_chart(
+       # fig7,
+       # use_container_width=True
+   # )
 
 # ==================================================
 # DOWNLOAD
