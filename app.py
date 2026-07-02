@@ -193,8 +193,8 @@ with col4:
 
 tab1, tab2, tab3 = st.tabs([
     "📚 Topic Analysis",
-    "🚫 Cancelled Sessions",
-    "📵 Offline Sessions"
+    #"🚫 Cancelled Sessions",
+   # "📵 Offline Sessions"
 ])
 
 # ==================================================
