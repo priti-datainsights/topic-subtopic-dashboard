@@ -190,12 +190,14 @@ with col4:
 # ==================================================
 # TABS
 # ==================================================
-
-tab1,tab2,tab3 = st.tabs([
-    "📚 Topic Analysis",
-     " Cancelled Sessions",
-    " Offline Sessions"
-])
+tab1 = st.tabs([
+    "📚 Topic Analysis"
+])[0]
+#tab1,tab2,tab3 = st.tabs([
+   # "📚 Topic Analysis",
+    # " Cancelled Sessions",
+    #" Offline Sessions"
+#])
 
 # ==================================================
 # TOPIC ANALYSIS
